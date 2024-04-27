@@ -1,66 +1,158 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Steps for How to Install and Use Yajra Datatables in Laravel 11
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+## Step 1: Download the New Laravel Application
 
-## About Laravel
+Run `composer create-project --prefer-dist laravel/laravel LaravelDataTables` command on cmd to download and setup new Laravel application into your system:
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+```bash
+composer create-project --prefer-dist laravel/laravel LaravelDataTables
+```
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Step 2: Configure the Database with the Application
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+Open .env file from root folder of laravel project, and configure database details into it; something like this:
 
-## Learning Laravel
+```bash
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=your_db_name
+DB_USERNAME=your_db_user
+DB_PASSWORD=your_db_pass
+```
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+## Step 3: Install Yajra DataTables Package
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+Run the composer require yajra/laravel-datatables-oracle command on cmd to install yajra dataTables in laravel project:
+```bash
+cd LaravelDataTables
+composer require yajra/laravel-datatables-oracle
+```
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## Step 4: Add Dummy Data on Database
 
-## Laravel Sponsors
+Run the following command on cmd to generate fake data for testing Yajra dataTables in the laravel project; something like this:
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+```bash
+php artisan tinker
+  
+User::factory()->count(50)->create()
+```
 
-### Premium Partners
+## Step 5: Create Controller File
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+Run php artisan make:controller MyTestController command on cmd to create a new controller file:
 
-## Contributing
+```bash
+php artisan make:controller MyTestController
+```
+Now open MyTestController.php file from app/http/controllers folder, and create one method to pass data on dataTable views; something like this:
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+```bash
+<?php
+   
+namespace App\Http\Controllers;
+  
+use Illuminate\Http\Request;
 
-## Code of Conduct
+use App\Models\User;
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+use DataTables;
+  
+class MyTestController extends Controller
+{
+    /**
+     //handle yajra datatable views and data
+     */
+    public function dataTableLogic(Request $request)
+    {
+        if ($request->ajax()) {
+            $users = User::select('*');
+            return datatables()->of($users)
+                ->make(true);
+        }
+          
+        return view('y-dataTables');
+    }
+}
+```
+## Step 6: Define Routes
 
-## Security Vulnerabilities
+Open web.php file from routes folder, and create route in it to handle logic between controller and view file; something like this:
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+```bash
+<?php
+  
+use Illuminate\Support\Facades\Route;
+  
+use App\Http\Controllers\MyTestController;
+  
+Route::get('list', [MyTestController::class, 'dataTableLogic']);
+```
+## Step 7: Create View
 
-## License
+To create view file name y-dataTables.blade.php in resources/views folder to show dataTables with data from database; something like this:
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+```bash
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<title>Laravel 11 DataTables Example - Tutsmake.com</title>
+
+ <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4" crossorigin="anonymous"></script>
+
+<script src="https://code.jquery.com/jquery-3.6.1.min.js"></script>
+
+<link  href="https://cdn.datatables.net/1.10.21/css/jquery.dataTables.min.css" rel="stylesheet">
+
+<script src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.min.js"></script>
+
+</head>
+      <body>
+         <div class="container">
+               <h2>Laravel 11 DataTables Example - Tutsmake.com</h2>
+            <table class="table table-bordered" id="y_dataTables">
+               <thead>
+                  <tr>
+                     <th>Id</th>
+                     <th>Name</th>
+                     <th>Email</th>
+                     <th>Created at</th>
+                  </tr>
+               </thead>
+            </table>
+         </div>
+   <script>
+   $(document).ready( function () {
+    $('#y_dataTables').DataTable({
+           processing: true,
+           serverSide: true,
+           ajax: "{{ url('list') }}",
+           columns: [
+                    { data: 'id', name: 'id' },
+                    { data: 'name', name: 'name' },
+                    { data: 'email', name: 'email' },
+                    { data: 'created_at', name: 'created_at' }
+                 ]
+        });
+     });
+  </script>
+   </body>
+</html>
+```
+## Step 8: Run and Test Application
+
+Run php artisan serve command on cmd to start application server:
+
+```bash
+php artisan serve
+```
+Ready to run this app at http://127.0.0.1:8000/list URL on browser:
+
+```bash
+http://127.0.0.1:8000/list
+```
+
