@@ -8,3 +8,4 @@ Route::get('/', function () {
 });
 
 Route::get('/list',[DatatableController::class,'dataTableLogic']);
+Route::post('/store',[DatatableController::class,'store']);

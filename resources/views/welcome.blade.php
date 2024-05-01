@@ -36,7 +36,7 @@
                 <h2>Laravel 11 Ajax CRUD Operation Example Tutorial - Tutsmake.com</h2>
             </div>
             <div class="pull-right mb-2 mt-1">
-                <a class="btn btn-success" onClick="add()" href="javascript:void(0)"> Add Blog Post</a>
+                <button data-bs-target="#user-modal" data-bs-toggle="modal" class="btn btn-success" > Add Blog Post</button>
             </div>
         </div>
     </div>
@@ -64,8 +64,8 @@
     </div>
 
 </div>
-<!-- boostrap blog model -->
-<div class="modal fade" id="blog-modal" aria-hidden="true">
+{{--Add Modal--}}
+<div class="modal fade" id="user-modal" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
@@ -76,23 +76,31 @@
                       enctype="multipart/form-data">
                     <input type="hidden" name="id" id="id">
                     <div class="form-group">
-                        <label for="name" class="col-sm-2 control-label">Title</label>
+                        <label for="name" class="col-sm-2 control-label">Name</label>
                         <div class="col-sm-12">
-                            <input type="text" class="form-control" id="title" name="title" placeholder="Enter title"
+                            <input type="text" class="form-control" id="name" name="name" placeholder="Enter title"
                                    maxlength="50" required="">
                         </div>
                     </div>
 
                     <div class="form-group">
-                        <label class="col-sm-2 control-label">Detail</label>
+                        <label for="email" class="col-sm-2 control-label">Email</label>
                         <div class="col-sm-12">
-                            <input type="text" class="form-control" id="detail" name="detail" placeholder="Enter Detail"
+                            <input type="email" class="form-control" id="email" name="email" placeholder="Enter Detail"
                                    required="">
                         </div>
                     </div>
 
+                    <div class="form-group">
+                        <label for="password" class="col-sm-2 control-label">password</label>
+                        <div class="col-sm-12">
+                            <input type="password" class="form-control" id="password" name="password" placeholder="Enter password"
+                                   required="">
+                        </div>
+                    </div>
+                    
                     <div class="col-sm-offset-2 col-sm-10">
-                        <button type="submit" class="btn btn-primary" id="btn-save">Save changes
+                        <button type="button" class="btn btn-primary" id="btn-save" onclick="store()" >Save changes
                         </button>
                     </div>
                 </form>
@@ -165,7 +173,7 @@
             serverSide: true,
             ajax: "{{ url('/list') }}",
             columns: [
-                {data: 'id', name: 'id'},
+                {data: 'DT_RowIndex', name: 'id', searchable: false},
                 {data: 'name', name: 'name'},
                 {data: 'email', name: 'email'},
                 {data: 'created_at', name: 'created_at'},
@@ -176,75 +184,70 @@
 
     });
 
-    function add() {
 
-        $('#blogForm').trigger("reset");
-        $('#BlogModal').html("Add Blog");
-        $('#blog-modal').modal('show');
-        $('#id').val('');
 
-    }
-
-    function editFunc(id) {
-
-        $.ajax({
-            type: "POST",
-            url: "{{ url('edit-blog') }}",
-            data: {id: id},
-            dataType: 'json',
-            success: function (res) {
-                $('#BlogModal').html("Edit Blog");
-                $('#blog-modal').modal('show');
-                $('#id').val(res.id);
-                $('#title').val(res.title);
-                $('#detail').val(res.detail);
-            }
-        });
-    }
-
-    function deleteFunc(id) {
-        if (confirm("Delete Record?") == true) {
-            var id = id;
-
-            // ajax
-            $.ajax({
-                type: "POST",
-                url: "{{ url('delete-blog') }}",
-                data: {id: id},
-                dataType: 'json',
-                success: function (res) {
-
-                    var oTable = $('#blogs').dataTable();
-                    oTable.fnDraw(false);
-                }
-            });
-        }
-    }
-
-    $('#blogForm').submit(function (e) {
-
-        e.preventDefault();
-
-        var formData = new FormData(this);
+   async function store()
+    {
+        
 
         $.ajax({
             type: 'POST',
-            url: "{{ url('store-blog')}}",
-            data: formData,
+            url: "{{ url('/store')}}",
+            data: {name: $('#name').val(), email: $('#email').val(), password: $('#password').val()},
             cache: false,
             contentType: false,
             processData: false,
             success: (data) => {
-                $("#blog-modal").modal('hide');
-                var oTable = $('#blogs').dataTable();
-                oTable.fnDraw(false);
-                $("#btn-save").html('Submit');
-                $("#btn-save").attr("disabled", false);
+                $("#user-modal").modal('hide');
+                // var oTable = $('#blogs').dataTable();
+                // oTable.fnDraw(false);
+                // $("#btn-save").html('Submit');
+                // $("#btn-save").attr("disabled", false);
+                
+                
             },
             error: function (data) {
                 console.log(data);
             }
         });
-    });
+    }
+    
+    {{--function editFunc(id) {--}}
+    
+    {{--    $.ajax({--}}
+    {{--        type: "POST",--}}
+    {{--        url: "{{ url('edit-blog') }}",--}}
+    {{--        data: {id: id},--}}
+    {{--        dataType: 'json',--}}
+    {{--        success: function (res) {--}}
+    {{--            $('#BlogModal').html("Edit Blog");--}}
+    {{--            $('#blog-modal').modal('show');--}}
+    {{--            $('#id').val(res.id);--}}
+    {{--            $('#title').val(res.title);--}}
+    {{--            $('#detail').val(res.detail);--}}
+    {{--        }--}}
+    {{--    });--}}
+    {{--}--}}
+    
+    {{--function deleteFunc(id) {--}}
+    {{--    if (confirm("Delete Record?") == true) {--}}
+    {{--        var id = id;--}}
+    
+    {{--        // ajax--}}
+    {{--        $.ajax({--}}
+    {{--            type: "POST",--}}
+    {{--            url: "{{ url('delete-blog') }}",--}}
+    {{--            data: {id: id},--}}
+    {{--            dataType: 'json',--}}
+    {{--            success: function (res) {--}}
+    
+    {{--                var oTable = $('#blogs').dataTable();--}}
+    {{--                oTable.fnDraw(false);--}}
+    {{--            }--}}
+    {{--        });--}}
+    {{--    }--}}
+    {{--}--}}
+    
+    
 
 </script>
